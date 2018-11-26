@@ -1,6 +1,7 @@
 package au.org.ala.charts
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.util.Metadata
 import groovy.json.JsonSlurper
 
@@ -8,6 +9,8 @@ import groovy.json.JsonSlurper
  * Taglib for rendering charts
  */
 class ChartsTagLib {
+
+    GrailsApplication grailsApplication
 
     static namespace = "charts"
 
@@ -41,6 +44,11 @@ class ChartsTagLib {
             def appName = Metadata.current.'info.app.name'
             def configPath = "/data/${appName}/config/charts.json"
             def js = new JsonSlurper()
+
+            if (!((new File(configPath)).exists())){
+                configPath = grailsApplication.mainContext.getClassLoader().getResource(grailsApplication.config.get("grails.resources.chart")).file
+            }
+
             chartsConfig = js.parse(new FileReader(new File(configPath)))
         }
         chartsConfig
